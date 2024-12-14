@@ -1,7 +1,8 @@
 from preprocessing.preprocessing import get_data, preprocess
 from lsh_methods.lsh_methods import kmeans_lsh, signed_random_projections_lsh
-from evaluation.evaluation import evaluate_retrieval, plot_clusters, plot_radial_clusters, plot_by_frequency, plot_top_words_by_category
+from evaluation.evaluation import evaluate_retrieval, plot_clusters, plot_radial_clusters, plot_by_frequency, plot_silhouette, write_clusters_to_file
 from sklearn.metrics.pairwise import cosine_similarity
+import numpy as np
 
 def main():
     #Load and preprocess data !!!!
@@ -17,6 +18,7 @@ def main():
     print(kmeans_labels)
     plot_clusters(tfidf_matrix, kmeans_labels, categories_of_documents)
     plot_radial_clusters(kmeans_labels, categories_of_documents)
+    plot_silhouette(tfidf_matrix, kmeans_labels, categories_of_documents, target_names)
     
     #Section for Signed Random Projections LSH
     print("Applying Signed Random Projections LSH...")
@@ -36,7 +38,18 @@ def main():
     #Get a list of the terms in order of frequency and plot
     plot_by_frequency(tfidf_matrix, vectorizer)
 
-    plot_top_words_by_category(tfidf_matrix, vectorizer, categories_of_documents)
+    write_clusters_to_file(kmeans_labels, categories_of_documents)
+
+    #this section is to just try and visualize
+    print("")
+    print("categories_of_documents: ", categories_of_documents)
+    print("")
+    print("tfidf matrix: " , tfidf_matrix)
+    print("")
+    print("kmeans_labels")
+    np.set_printoptions(threshold=np.inf)
+    print(kmeans_labels)
+    print(len(kmeans_labels))
 
 if __name__ == "__main__":
     main()
