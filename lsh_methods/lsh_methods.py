@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn.cluster import KMeans
 
-def kmeans_lsh(tfidf_matrix, n_clusters=10):
+def kmeans_lsh(tfidf_matrix, n_clusters=7):
     """
     Perform K-means clustering and use cluster assignments as hash codes.
 

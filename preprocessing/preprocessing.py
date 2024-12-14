@@ -18,10 +18,11 @@ def get_data(sample_size=None):
         - data.target : array of numerical labels for each document
         - data.target_names : array containing the names of all the categories
     """
-    sports_categories = ['rec.autos', 'rec.motorcycles', 'rec.sport.baseball', 'rec.sport.hockey']  #only including sports ones for now!!!
+    sports_categories = ['rec.autos', 'rec.motorcycles', 'rec.sport.baseball', 'rec.sport.hockey']  
     science_categories = ['sci.electronics', 'sci.med', 'sci.space']
     comp_categories = ['comp.sys.mac.hardware', 'comp.graphics', 'comp.windows.x' , 'comp.sys.ibm.pc.hardware']
-    categories = sports_categories + science_categories + comp_categories
+    religion_categories = ['talk.religion.misc', 'soc.religion.christian']
+    categories = sports_categories + science_categories + comp_categories + religion_categories
     data = fetch_20newsgroups(subset='all', categories=categories, remove=('headers', 'footers', 'quotes'))
 
     def remove_numbers(text):
