@@ -10,7 +10,7 @@ def kmeans_lsh(tfidf_matrix, n_clusters=10):
         - n_clusters: Number of clusters.
     
     Returns:
-        - Cluster labels for each document.
+        - labels: Cluster labels for each document.
     """
     kmeans = KMeans(n_clusters=n_clusters, random_state=42)
     labels = kmeans.fit_predict(tfidf_matrix)

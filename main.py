@@ -1,6 +1,6 @@
-from preprocessing import get_data, preprocess
-from lsh_methods import kmeans_lsh, signed_random_projections_lsh
-from evaluation import evaluate_retrieval, plot_clusters
+from preprocessing.preprocessing import get_data, preprocess
+from lsh_methods.lsh_methods import kmeans_lsh, signed_random_projections_lsh
+from evaluation.evaluation import evaluate_retrieval, plot_clusters
 from sklearn.metrics.pairwise import cosine_similarity
 
 def main():
@@ -13,8 +13,9 @@ def main():
     # Step 2: Apply K-means LSH
     print("Applying K-means LSH...")
     kmeans_labels = kmeans_lsh(tfidf_matrix)
-    #plot_clusters(tfidf_matrix, kmeans_labels, title="K-means LSH Clusters")
-    plot_clusters(tfidf_matrix, kmeans_labels)
+    print("kmeans_labels")
+    print(kmeans_labels)
+    plot_clusters(tfidf_matrix, kmeans_labels, categories_of_documents)
     
     # Step 3: Apply Signed Random Projections LSH
     print("Applying Signed Random Projections LSH...")
