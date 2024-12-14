@@ -2,6 +2,7 @@ from sklearn.datasets import fetch_20newsgroups
 from sklearn.feature_extraction.text import TfidfVectorizer
 from collections import defaultdict
 import nltk
+import re
 
 nltk.download('stopwords')
 
@@ -17,13 +18,24 @@ def get_data(sample_size=None):
         - data.target : array of numerical labels for each document
         - data.target_names : array containing the names of all the categories
     """
-    categories = ['rec.autos', 'rec.motorcycles', 'rec.sport.baseball', 'rec.sport.hockey']  #only including sports ones for now!!!
+    sports_categories = ['rec.autos', 'rec.motorcycles', 'rec.sport.baseball', 'rec.sport.hockey']  #only including sports ones for now!!!
+    science_categories = ['sci.electronics', 'sci.med', 'sci.space']
+    comp_categories = ['comp.sys.mac.hardware', 'comp.graphics', 'comp.windows.x' , 'comp.sys.ibm.pc.hardware']
+    categories = sports_categories + science_categories + comp_categories
     data = fetch_20newsgroups(subset='all', categories=categories, remove=('headers', 'footers', 'quotes'))
+
+    def remove_numbers(text):
+        """
+        Remove all numerical content from a given text document.
+        """
+        return re.sub(r'\d+', '', text)
+    
+    filtered_texts = [remove_numbers(doc) for doc in data.data]
     
     if sample_size:
-        return data.data[:sample_size], data.target[:sample_size], data.target_names
+        return filtered_texts[:sample_size], data.target[:sample_size], data.target_names
     
-    return data.data, data.target, data.target_names
+    return filtered_texts, data.target, data.target_names
 
 def preprocess(texts, labels, target_names, max_features=15000, min_df=10):
     """
@@ -89,42 +101,3 @@ def get_term_occurrences(tfidf_matrix, vectorizer):
         print(f"Term: {term}")
         print(f"Appears in Documents: {docs}")
         print("")
-
-def get_by_frequency(tfidf_matrix, vectorizer):
-    """
-    Rank terms by their overall frequency across all documents.
-
-    Params:
-       - tfidf_matrix : The sparse TF-IDF matrix.
-       - vectorizer : The fitted TfidfVectorizer. This contains the vocabulary and statistics for the terms we have.
-    """
-    terms = vectorizer.get_feature_names_out() 
-    term_frequencies = tfidf_matrix.sum(axis=0)  #get the total number of documents the term occurs in
-    term_frequencies = term_frequencies.A1  #convert to array
-
-    #combine terms with their frequencies
-    term_frequency_pairs = list(zip(terms, term_frequencies))
-
-    #sort terms by frequency (descending order)
-    ranking = sorted(term_frequency_pairs, key=lambda x: x[1], reverse=True)
-
-    #display the top 25 terms 
-    print("Top Terms by Frequency:")
-    for term, frequency in ranking[:25]: 
-        print(f"Term: {term}, Frequency: {frequency}")
-
-def main():
-    #get the data (only specifying 250 documents for now)
-    texts, labels, target_names = get_data(250)  
-
-    #preprocess 
-    tfidf_matrix, vectorizer, categories_of_documents = preprocess(texts, labels, target_names)
-
-    #display all of terms and which documents they occur in
-    get_term_occurrences(tfidf_matrix, vectorizer)
-
-    #get a list of the terms in order of frequency
-    get_by_frequency(tfidf_matrix, vectorizer)
-
-if __name__ == "__main__":
-    main() 
