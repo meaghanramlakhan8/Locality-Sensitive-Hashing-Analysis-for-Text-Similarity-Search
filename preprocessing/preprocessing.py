@@ -25,7 +25,7 @@ def get_data(sample_size=None):
     
     return data.data, data.target, data.target_names
 
-def preprocess(texts, max_features=15000, min_df=10):
+def preprocess(texts, labels, target_names, max_features=15000, min_df=10):
     """
     Takes raw text data and converts it into TF-IDF vectors.
     (basically numerical representations of the text documents)
@@ -42,18 +42,28 @@ def preprocess(texts, max_features=15000, min_df=10):
             by the TfidfVectorizer).
             - The numbers under the Values column are the TF-IDF values scores for that respective position.
       - vectorizer : The fitted TfidfVectorizer. This contains the vocabulary and statistics for the terms we have.
+      - categories_of_documents : Mapping of the categories that we have to the list of indexes (documents) corresponding
+      to it in the tfidf_matrix.
     """
     vectorizer = TfidfVectorizer(stop_words='english', lowercase=True, max_features=max_features, min_df=min_df)
 
     tfidf_matrix = vectorizer.fit_transform(texts)
 
+    #create a mapping of category names to their corresponding document indices
+    categories_of_documents = defaultdict(list)
+    for doc_idx, label in enumerate(labels):
+        category_name = target_names[label]
+        categories_of_documents[category_name].append(doc_idx)
+
+    print("")
+    print("categories_of_documents: ", categories_of_documents)
     print("")
     print("Vocabulary:", vectorizer.vocabulary_)
     print("")
-    print(tfidf_matrix)
+    print("tfidf matrix: " , tfidf_matrix)
     print("")
 
-    return tfidf_matrix, vectorizer
+    return tfidf_matrix, vectorizer, categories_of_documents
 
 def get_term_occurrences(tfidf_matrix, vectorizer):
     """
@@ -108,7 +118,7 @@ def main():
     texts, labels, target_names = get_data(250)  
 
     #preprocess 
-    tfidf_matrix, vectorizer = preprocess(texts)
+    tfidf_matrix, vectorizer, categories_of_documents = preprocess(texts, labels, target_names)
 
     #display all of terms and which documents they occur in
     get_term_occurrences(tfidf_matrix, vectorizer)
