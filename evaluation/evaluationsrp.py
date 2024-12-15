@@ -95,7 +95,6 @@ def write_srp_clusters_to_file(tfidf_matrix, hash_codes, categories_of_documents
                 f.write(f"    Document {doc_idx} - Category: {category}\n")
             f.write("\n")
     
-    print(f"SRP cluster details written to {output_file}")
 
 def plot_similarity_to_srp_centroids(tfidf_matrix, hash_codes):
     """

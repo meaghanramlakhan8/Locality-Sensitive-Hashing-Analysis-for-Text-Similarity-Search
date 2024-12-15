@@ -1,7 +1,9 @@
 import numpy as np
+from lsh_methods.lsh_methods import kmeans_lsh, signed_random_projections_lsh
 from sklearn.metrics import precision_recall_curve, auc
 from sklearn.metrics.pairwise import cosine_similarity
 import matplotlib.pyplot as plt
+from collections import defaultdict
 
 def generate_ground_truth(labels):
     """
@@ -50,34 +52,66 @@ def compute_similarity_scores(tfidf_matrix, method="srp", cluster_labels=None):
     else:
         raise ValueError("Invalid method or missing cluster labels for K-means.")
 
-def plot_comparative_precision_recall(y_true, scores_srp, scores_kmeans):
+
+def compute_lsh_precisions(tfidf_matrix, categories_of_documents):
     """
-    Plot Precision-Recall Curves for SRP-LSH and K-means LSH.
+    Evaluate K-means LSH and SRP LSH precisions for different numbers of clusters and planes.
 
     Params:
-        - y_true: Ground truth binary relevance labels (1 for relevant, 0 for non-relevant).
-        - scores_srp: Predicted similarity scores for SRP-LSH.
-        - scores_kmeans: Predicted similarity scores for K-means LSH.
+        - tfidf_matrix: Sparse TF-IDF matrix.
+        - categories_of_documents: Mapping of categories to the list of document indices.
+        - cluster_range: List of cluster sizes to evaluate for K-means.
+        - plane_range: List of numbers of hyperplanes to evaluate for SRP.
+
+    Returns:
+        - results: Dictionary containing precision scores for both K-means and SRP.
     """
-    # Precision-Recall for SRP-LSH
-    precision_srp, recall_srp, _ = precision_recall_curve(y_true, scores_srp)
-    pr_auc_srp = auc(recall_srp, precision_srp)
+    cluster_range = [5, 10, 15, 20, 25, 30]
+    plane_range = [5, 10, 15, 20, 25, 30]
 
-    # Precision-Recall for K-means LSH
-    precision_kmeans, recall_kmeans, _ = precision_recall_curve(y_true, scores_kmeans)
-    pr_auc_kmeans = auc(recall_kmeans, precision_kmeans)
+    # Reverse mapping: document index -> category
+    doc_to_category = {}
+    for category, doc_indices in categories_of_documents.items():
+        for doc_idx in doc_indices:
+            doc_to_category[doc_idx] = category
 
-    # Plot the curves
-    plt.figure(figsize=(10, 6))
-    plt.plot(recall_srp, precision_srp, label=f"SRP-LSH (AUC = {pr_auc_srp:.2f})", color="blue", linewidth=2)
-    plt.plot(recall_kmeans, precision_kmeans, label=f"K-means LSH (AUC = {pr_auc_kmeans:.2f})", color="orange", linewidth=2)
+    results = {"kmeans": {}, "srp": {}}
 
-    plt.title("Precision-Recall Curves: SRP-LSH vs. K-means LSH", fontsize=16)
-    plt.xlabel("Recall", fontsize=14)
-    plt.ylabel("Precision", fontsize=14)
-    plt.legend(fontsize=12)
-    plt.grid(True, linestyle="--", alpha=0.6)
+    # Evaluate K-means LSH
+    for n_clusters in cluster_range:
+        kmeans_labels = kmeans_lsh(tfidf_matrix, n_clusters=n_clusters)
 
-    comparison_plots_dir = os.path.join(os.getcwd(), "plots/comparison_plots") #setting output directory to be comparison_plots
-    plt.savefig(os.path.join(comparison_plots_dir, "plot_comparative_precision_recall.png"))
-    plt.show()
+        kmeans_clusters = defaultdict(list)
+        for doc_idx, cluster in enumerate(kmeans_labels):
+            category = doc_to_category.get(doc_idx, "Unknown")
+            kmeans_clusters[cluster].append(category)
+
+        precision_kmeans = 0
+        for cluster, cluster_categories in kmeans_clusters.items():
+            # Find the most frequent category in the cluster
+            majority_label_count = max([cluster_categories.count(category) for category in set(cluster_categories)])
+            precision_kmeans += majority_label_count / len(cluster_categories)
+
+        precision_kmeans /= len(kmeans_clusters)
+        results["kmeans"][n_clusters] = precision_kmeans
+
+    # Evaluate SRP-LSH
+    for n_planes in plane_range:
+        srp_hashes = signed_random_projections_lsh(tfidf_matrix, n_planes=n_planes)
+        srp_buckets = np.dot(srp_hashes, 1 << np.arange(srp_hashes.shape[1]))
+
+        srp_buckets_to_categories = defaultdict(list)
+        for doc_idx, bucket in enumerate(srp_buckets):
+            category = doc_to_category.get(doc_idx, "Unknown")
+            srp_buckets_to_categories[bucket].append(category)
+
+        precision_srp = 0
+        for bucket, bucket_categories in srp_buckets_to_categories.items():
+            # Find the most frequent category in the bucket
+            majority_label_count = max([bucket_categories.count(category) for category in set(bucket_categories)])
+            precision_srp += majority_label_count / len(bucket_categories)
+
+        precision_srp /= len(srp_buckets_to_categories)
+        results["srp"][n_planes] = precision_srp
+
+    return results
