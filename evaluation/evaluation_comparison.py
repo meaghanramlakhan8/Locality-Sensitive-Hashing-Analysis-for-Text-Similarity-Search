@@ -6,54 +6,6 @@ import matplotlib.pyplot as plt
 from collections import defaultdict
 import os
 
-def generate_ground_truth(labels):
-    """
-    Generate ground truth for Precision-Recall evaluation.
-
-    Params:
-        - labels: Ground truth category labels for each document.
-
-    Returns:
-        - y_true: Binary relevance labels for all document pairs.
-    """
-    n = len(labels)
-    y_true = np.zeros((n, n))
-    for i in range(n):
-        for j in range(n):
-            y_true[i, j] = 1 if labels[i] == labels[j] else 0
-    return y_true.flatten()
-
-def compute_similarity_scores(tfidf_matrix, method="srp", cluster_labels=None):
-    """
-    Compute similarity scores for SRP-LSH or K-means LSH.
-
-    Params:
-        - tfidf_matrix: Sparse TF-IDF matrix.
-        - method: "srp" or "kmeans".
-        - cluster_labels: Cluster assignments for K-means (required for "kmeans").
-
-    Returns:
-        - scores: Pairwise similarity scores for the selected method.
-    """
-    if method == "srp":
-        # Use cosine similarity for all documents
-        return cosine_similarity(tfidf_matrix)
-
-    elif method == "kmeans" and cluster_labels is not None:
-        # Compute similarity within clusters
-        scores = []
-        for cluster in np.unique(cluster_labels):
-            # Get documents in the same cluster
-            cluster_indices = np.where(cluster_labels == cluster)[0]
-            cluster_matrix = tfidf_matrix[cluster_indices]
-            cluster_scores = cosine_similarity(cluster_matrix)
-            scores.append(cluster_scores.flatten())
-        return np.concatenate(scores)
-
-    else:
-        raise ValueError("Invalid method or missing cluster labels for K-means.")
-
-
 def compute_lsh_precisions(tfidf_matrix, categories_of_documents):
     """
     Evaluate K-means LSH and SRP LSH precisions for different numbers of clusters and planes,
@@ -62,11 +14,6 @@ def compute_lsh_precisions(tfidf_matrix, categories_of_documents):
     Params:
         - tfidf_matrix: Sparse TF-IDF matrix.
         - categories_of_documents: Mapping of categories to the list of document indices.
-        - cluster_range: List of cluster sizes to evaluate for K-means.
-        - plane_range: List of numbers of hyperplanes to evaluate for SRP.
-
-    Returns:
-        - results: Dictionary containing precision scores for both K-means and SRP.
     """
     cluster_range = [3,6,9,12,15,18,21,24,27,30]
     plane_range = [3,6,9,12,15,18,21,24,27,30]
@@ -139,4 +86,3 @@ def compute_lsh_precisions(tfidf_matrix, categories_of_documents):
     comparison_plots_dir = os.path.join(os.getcwd(), "plots/comparison_plots") #setting output directory to be comparison_plots
     plt.savefig(os.path.join(comparison_plots_dir, "compute_lsh_precisions.png"))
     plt.show()
-    

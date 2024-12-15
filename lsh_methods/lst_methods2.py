@@ -11,6 +11,9 @@ def kmeans_lsh(tfidf_matrix, n_clusters=7):
     Returns:
         - labels: Cluster labels for each document.
     """
+    
+
+
 
 def signed_random_projections_lsh(tfidf_matrix, n_planes=10):
     """
