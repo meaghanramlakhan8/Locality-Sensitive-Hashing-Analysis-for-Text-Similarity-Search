@@ -1,126 +1,121 @@
 # **Comparative Analysis of K-means LSH and SRP-LSH for Text Similarity Search**
 
-## **Overview**
-Locality-Sensitive Hashing (LSH) is a widely-used technique for efficient similarity search in high-dimensional spaces, such as text document vectors represented by TF-IDF. While Signed Random Projections (SRP-LSH) is computationally efficient and scalable, its randomness often fails to fully exploit the inherent structure of text corpora. 
+---
 
-This study introduces and evaluates **K-means LSH**, which integrates clustering into the hashing process, adapting to the data distribution and potentially improving retrieval accuracy. By comparing K-means LSH to SRP-LSH, we explore the trade-offs between accuracy, efficiency, and scalability for text similarity search.
+## **Description**
+Locality-sensitive hashing (LSH) is an essential technique for approximate similarity search in high-dimensional spaces. This study explores and evaluates two LSH methods: **Signed Random Projections (SRP-LSH)** and **K-means LSH**, on the widely-used **20 Newsgroups Dataset** containing 18,000 text documents. The primary focus is on three key metrics:
+1. **Precision**: How well similar documents are grouped.
+2. **Query Processing Time**: Efficiency of document retrieval.
+3. **Memory Usage**: Resource efficiency during execution.
 
-Our findings aim to guide the selection of appropriate LSH methods for applications such as semantic clustering, nearest neighbor search, and large-scale text similarity analysis.
+This analysis provides actionable insights into the trade-offs between **scalability**, **accuracy**, and **efficiency**, helping researchers and developers select the most suitable LSH method for large-scale text similarity tasks.
 
 ---
 
-## **Objectives**
-- **Evaluate and compare two LSH methods** for text similarity search:
-  - **Signed Random Projections (SRP-LSH)**: Uses random hyperplanes to generate binary hash codes.
-  - **K-means LSH**: Uses cluster assignments from K-means clustering as hash codes.
-- Analyze trade-offs between:
-  - **Retrieval accuracy (Precision@k)**
-  - **Query efficiency**
-  - **Scalability for large datasets**
-- Explore the impact of hyperparameters such as:
-  - Number of hash functions (`n`) for SRP-LSH.
-  - Number of clusters (`k`) for K-means LSH.
-- Visualize results to provide insights into LSH performance under different conditions.
+## **Project Highlights**
+### **Why LSH for Text Similarity?**
+- **High Dimensionality**: Text vectors derived from TF-IDF representations are often sparse and high-dimensional, making similarity searches computationally expensive.
+- **Approximate Similarity**: LSH algorithms enable fast, approximate similarity computations by reducing the search space into manageable subsets.
+- **Scalable Retrieval**: Ideal for real-world applications involving millions of documents, such as search engines, recommendation systems, and document clustering.
 
 ---
 
-## **Methodology**
-
+## **Dataset and Preprocessing**
 ### **Dataset**
-We utilized the **20 Newsgroups Dataset**, a collection of 18,000 posts across 20 topics. The dataset was divided into:
-1. **Training data** for building LSH indices.
-2. **Testing data** for evaluating retrieval performance.
+- **20 Newsgroups Dataset**:
+  - ~18,000 documents.
+  - Distributed across **20 categories**: Sports, Science, Computers, and Religion.
 
-### **Preprocessing**
-- Removed headers, footers, and non-content elements.
-- Normalized text to lowercase and removed stopwords using NLTK.
-- Converted text to numerical vectors using **TF-IDF Vectorization** with the following parameters:
-  - `max_features=`: Retain the top 15,000 terms.
-  - `min_df=`: Ignore terms appearing in fewer than 10 documents.
-  - Default `use_idf=True`: Apply inverse document frequency reweighting.
+### **Preprocessing Steps**
+- **Text Cleaning**:
+  - Removed headers, footers, and non-content elements.
+  - Lowercased all text.
+  - Removed stopwords using **NLTK** and excluded numerical data.
+- **TF-IDF Vectorization**:
+  - Retained the top **15,000 terms** using `max_features=15000`.
+  - Ignored terms appearing in fewer than **10 documents** using `min_df=10`.
+  - Enabled inverse document frequency weighting (`use_idf=True`).
 
-### **Techniques**
-1. **Signed Random Projections LSH**:
-   - Generated binary hash codes using random hyperplanes.
-   - Experimented with varying numbers of hyperplanes (`n`).
-   - Compared retrieval performance across settings.
+---
+
+## **Implementation Details**
+
+### **LSH Methods**
+1. **Signed Random Projections (SRP-LSH)**:
+   - Generated binary hash codes using **10 random hyperplanes** sampled from a normal distribution.
+   - Created hash tables mapping each hash code to corresponding document IDs.
+   - Optimized for speed and memory efficiency.
 
 2. **K-means LSH**:
-   - Applied K-means clustering to TF-IDF vectors.
-   - Used cluster assignments as hash codes.
-   - Evaluated different numbers of clusters (`k`).
-
-3. **Baselines**:
-   - **Exact Nearest Neighbor Search** (Upper bound): Compared query vectors with all dataset vectors using cosine similarity.
-   - **Random Retrieval** (Minimal baseline): Randomly selected documents for comparison.
-
----
-
-## **Experiments**
+   - Clustered documents into **7 clusters** using the K-means algorithm.
+   - Cluster labels served as hash codes for efficient retrieval.
+   - Tuned for better semantic grouping but required higher computational resources.
 
 ### **Evaluation Metrics**
-- **Precision@k**: Fraction of relevant documents among the top `k` retrieved.
-- **Query Processing Time**: Time required to retrieve similar documents.
-- **Memory Usage**: Amount of memory consumed by LSH indices.
+1. **Precision**:
+   - Fraction of documents in a cluster/bucket belonging to the dominant category.
+2. **Query Processing Time**:
+   - Time taken to retrieve documents similar to a query.
+3. **Memory Usage**:
+   - Measured using Python’s `tracemalloc` library.
 
-### **Experimental Procedure**
-1. **Hyperparameter Tuning**:
-   - Varied `n` (number of hyperplanes) for SRP-LSH.
-   - Varied `k` (number of clusters) for K-means LSH.
-   - Identified optimal parameters for retrieval performance.
-2. **Baseline Comparison**:
-   - Evaluated both LSH methods against exact nearest neighbor search and random retrieval.
-3. **Dimensionality Reduction**:
-   - Applied **Truncated SVD** to analyze the impact of reducing vector dimensions on LSH performance.
-
----
-
-## **Results**
-
-### **Preliminary Findings**
-1. **K-means LSH**:
-   - Higher **Precision@k** than SRP-LSH, particularly for smaller datasets.
-   - Longer indexing time due to clustering but better semantic grouping.
-   - Increased memory usage due to cluster information storage.
-
-2. **SRP-LSH**:
-   - Faster index build time and better scalability for larger datasets.
-   - Lower memory usage compared to K-means LSH.
-   - Lower **Precision@k**, likely due to the randomized nature of hyperplane projections.
-
-3. **Hyperparameter Insights**:
-   - Optimal performance observed at:
-     - **10 hyperplanes** for SRP-LSH.
-     - **7 clusters** for K-means LSH.
-   - Multi-probing strategies improved recall for SRP-LSH.
-
-### **Visualizations**
-- **Similarity Distribution**:
-  - Histograms of document similarities with KDE curves for each method.
-- **Cluster Analysis**:
-  - PCA-based scatter plots to visualize K-means clusters and SRP hash buckets.
-- **Hyperparameter Impact**:
-  - Line plots showing how increasing `n` or `k` affects retrieval metrics.
+### **Experimental Setup**
+- **Baseline Comparisons**:
+  - Exact nearest neighbor search (upper bound).
+  - Random retrieval (lower bound).
+- **Scalability Analysis**:
+  - Evaluated performance on dataset sizes ranging from **2,500 to 18,000 documents**.
+- **Hyperparameter Tuning**:
+  - Experimented with varying `n_planes` for SRP-LSH and `n_clusters` for K-means LSH.
 
 ---
 
-## **Conclusion**
-This study highlights the trade-offs between **K-means LSH** and **SRP-LSH** for text similarity search:
-- K-means LSH excels in semantic grouping but is resource-intensive.
-- SRP-LSH is faster and more scalable but less accurate for small, semantically diverse datasets.
+## **Experimental Results**
+### **Key Findings**
+- **Precision**:
+  - SRP-LSH achieved **~90%**, grouping semantically similar documents effectively.
+  - K-means LSH reached **~80%**, but with better adaptability to non-uniform distributions.
+- **Query Time**:
+  - SRP-LSH maintained consistent, low query times (<0.05 seconds).
+  - K-means LSH showed variability, peaking at **0.2 seconds** for large datasets.
+- **Memory Usage**:
+  - SRP-LSH required only **2.75 MB**, making it suitable for memory-constrained systems.
+  - K-means LSH consumed **16.23 MB**, reflecting its overhead for cluster management.
 
-By tuning hyperparameters and employing dimensionality reduction, both methods can achieve significant improvements in retrieval accuracy and efficiency.
+### **Visualization**
+1. **Precision Comparison**:
+   - Plots showing SRP-LSH's higher precision across dataset sizes.
+2. **Query Time Analysis**:
+   - Line plots depicting SRP-LSH's faster performance.
+3. **Memory Usage**:
+   - Bar charts highlighting SRP-LSH's resource efficiency.
+
+---
+
+## **How to Run the Project**
+### **Dependencies**
+Install the required libraries:
+```bash
+pip install numpy scikit-learn nltk matplotlib
+```
+
+### **Running the Code**
+1. Run the main script:
+   ```bash
+   python3 main.py
+   ```
+
+### **Outputs**
+- **Plots**:
+  - Stored in the plots folder
+  - Grouped by comparison plots, kmeans plots, SRP plots
+  - Memory Usage Bar Chart.
+- **Results**:
+  - Text files: `srp_results.txt` and `kmeans_results.txt`.
 
 ---
 
 ## **Future Work**
-- Implement approximate K-means clustering to reduce index build time.
-- Explore multi-probing techniques to enhance SRP-LSH recall.
-- Extend the analysis to other text similarity datasets and longer documents.
-- Investigate hybrid methods that combine SRP-LSH and K-means clustering.
-
----
-
-## **References**
-- Paulevé, Loïc, et al. "Locality Sensitive Hashing: A Comparison of Hash Function Types and Querying Mechanisms." *Pattern Recognition Letters*, 2010.  
-- Jafari, Omid, et al. "A Survey on Locality Sensitive Hashing Algorithms and Their Applications." *arXiv*, 2021.
+- Implement approximate K-means to reduce clustering overhead.
+- Apply multi-probing strategies to improve SRP-LSH recall.
+- Extend analysis to datasets with longer or more complex documents.
