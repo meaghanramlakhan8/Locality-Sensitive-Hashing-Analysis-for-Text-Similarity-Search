@@ -18,14 +18,14 @@ def compute_srp_centroids(tfidf_matrix, hash_codes):
         - centroids: A dictionary mapping hash bucket IDs to their centroids.
         - bucket_assignments: A dictionary mapping hash bucket IDs to document indices.
     """
-    # Convert binary hash codes to integer bucket IDs
+    #convert binary hash codes to integer bucket IDs
     bucket_ids = np.dot(hash_codes, 1 << np.arange(hash_codes.shape[1]))
 
-    # Group documents by their hash bucket
+    #group documents by their hash bucket
     unique_buckets = np.unique(bucket_ids)
     bucket_assignments = {bucket: np.where(bucket_ids == bucket)[0] for bucket in unique_buckets}
 
-    # Compute centroids for each bucket
+    #compute centroids for each bucket
     centroids = {}
     for bucket, indices in bucket_assignments.items():
         bucket_matrix = tfidf_matrix[indices]
@@ -43,20 +43,20 @@ def write_srp_clusters_to_file(tfidf_matrix, hash_codes, categories_of_documents
         - categories_of_documents: Mapping of the categories to the list of indices (documents).
         - output_file: Name of the output file to write to.
     """
-    # Convert hash codes to integer bucket IDs
+    #convert hash codes to integer bucket IDs
     bucket_ids = np.dot(hash_codes, 1 << np.arange(hash_codes.shape[1]))
 
-    # Map documents to their categories
+    #map documents to their categories
     doc_to_category = {}
     for category, doc_indices in categories_of_documents.items():
         for doc_idx in doc_indices:
             doc_to_category[doc_idx] = category
 
-    # Group documents by their hash buckets
+    #group documents by their hash buckets
     unique_buckets = np.unique(bucket_ids)
     bucket_assignments = {bucket: np.where(bucket_ids == bucket)[0] for bucket in unique_buckets}
 
-    # Write the results to the file
+    #write the results to the file
     with open(output_file, "w") as f:
         for bucket, indices in bucket_assignments.items():
             f.write(f"Hash Bucket {bucket}:\n")
@@ -68,12 +68,12 @@ def write_srp_clusters_to_file(tfidf_matrix, hash_codes, categories_of_documents
                     category_counts[category] = 0
                 category_counts[category] += 1
 
-            # Write category counts
+            #write category counts
             f.write("  Category Counts:\n")
             for category, count in category_counts.items():
                 f.write(f"    {category}: {count}\n")
 
-            # Write document details
+            #write document details
             f.write("  Documents:\n")
             for doc_idx in indices:
                 category = doc_to_category.get(doc_idx, "Unknown")
@@ -92,7 +92,7 @@ def plot_similarity_to_srp_centroids(tfidf_matrix, hash_codes):
     """
     centroids, bucket_assignments = compute_srp_centroids(tfidf_matrix, hash_codes)
 
-    # Compute similarities of documents to their assigned centroid
+    #compute similarities of documents to their assigned centroid
     similarities = []
     for bucket, indices in bucket_assignments.items():
         bucket_matrix = tfidf_matrix[indices]
@@ -102,11 +102,11 @@ def plot_similarity_to_srp_centroids(tfidf_matrix, hash_codes):
         centroid_dense = np.asarray(centroid).reshape(1, -1)
         similarities.extend(cosine_similarity(bucket_matrix_dense, centroid_dense).flatten())
 
-    # Calculate mean and median
+    #calculate mean and median
     mean_similarity = np.mean(similarities)
     median_similarity = np.median(similarities)
 
-    # Create histogram
+    #create histogram
     plt.figure(figsize=(12, 8))
     n, bins, _ = plt.hist(similarities, bins=30, alpha=0.7, color="blue", edgecolor="black", label="Similarity Distribution")
 
@@ -114,7 +114,7 @@ def plot_similarity_to_srp_centroids(tfidf_matrix, hash_codes):
     x_kde = np.linspace(min(similarities), max(similarities), 500)
     y_kde = kde(x_kde)
 
-    # Plot KDE curve
+    #plot KDE curve
     plt.plot(x_kde, y_kde * len(similarities) * (bins[1] - bins[0]), color="orange", label="KDE Curve", linewidth=2)
 
     plt.axvline(mean_similarity, color="red", linestyle="--", label=f"Mean: {mean_similarity:.2f}")
@@ -142,20 +142,20 @@ def visualize_srp_with_categories(tfidf_matrix, hash_codes, labels, target_names
         - target_names: List of category names corresponding to labels.
         - include_centroids: Whether to plot similarity to SRP centroids.
     """
-    # Reduce the TF-IDF matrix to 2D using PCA
+    #reduce the TF-IDF matrix to 2D using PCA
     pca = PCA(n_components=2)
     reduced_data = pca.fit_transform(tfidf_matrix.toarray())
 
-    # Convert binary hash codes to integers
+    #convert binary hash codes to integers
     hash_labels = np.dot(hash_codes, 1 << np.arange(hash_codes.shape[1]))
 
-    # Define the same markers for categories as the K-means plot
+    #define the same markers for categories as the K-means plot
     marker_styles = ['o', 's', 'D', '^', 'v', '<', '>', 'h', 'p', '*', 'x']
     unique_categories = np.unique(labels)
     marker_map = {cat: marker_styles[i % len(marker_styles)] for i, cat in enumerate(unique_categories)}
 
 
-    # Create scatter plot
+    #create scatter plot
     plt.figure(figsize=(12, 8))
     scatter = None
     for category in unique_categories:
@@ -170,11 +170,11 @@ def visualize_srp_with_categories(tfidf_matrix, hash_codes, labels, target_names
             marker=marker_map[category]  # Use consistent marker shapes
         )
 
-    # Add colorbar for hash buckets
+    #add colorbar for hash buckets
     cbar = plt.colorbar(scatter)
     cbar.set_label("Hash Bucket")
 
-    # Add legend for ground truth categories
+    #add legend for ground truth categories
     plt.legend(title="Categories", fontsize='small')
     plt.title("Cluster Visualization with SRP-LSH (Colors: Buckets, Shapes: Categories)")
     plt.xlabel("PCA Component 1")
@@ -197,27 +197,27 @@ def plot_similarity_vs_planes(tfidf_matrix, n_planes_range):
 
     for n_planes in n_planes_range:
         print(f"Testing SRP with {n_planes} hyperplanes...")
-        # Perform SRP with current number of hyperplanes
+        #perform SRP with current number of hyperplanes
         hash_codes = signed_random_projections_lsh(tfidf_matrix, n_planes)
         
-        # Compute SRP centroids and similarities
+        #compute SRP centroids and similarities
         centroids, bucket_assignments = compute_srp_centroids(tfidf_matrix, hash_codes)
         similarities = []
         for bucket, indices in bucket_assignments.items():
             bucket_matrix = tfidf_matrix[indices]
             centroid = centroids[bucket]
 
-            # Convert data to dense format
+            #convert data to dense format
             bucket_matrix_dense = bucket_matrix.toarray()
             centroid_dense = np.asarray(centroid).reshape(1, -1)
 
-            # Compute cosine similarities
+            #compute cosine similarities
             similarities.extend(cosine_similarity(bucket_matrix_dense, centroid_dense).flatten())
         
-        # Store the mean similarity for this n_planes
+        #store the mean similarity for this n_planes
         mean_similarities.append(np.mean(similarities))
     
-    # Plot the results
+    #plot the results
     plt.figure(figsize=(12, 8))
     plt.plot(n_planes_range, mean_similarities, marker='o', color='blue', label="Mean Similarity")
     plt.title("Mean Cosine Similarity vs. Number of SRP Hyperplanes", fontsize=16)

@@ -33,14 +33,14 @@ def compute_similarity_scores(tfidf_matrix, method="srp", cluster_labels=None):
         - scores: Pairwise similarity scores for the selected method.
     """
     if method == "srp":
-        # Use cosine similarity for all documents
+        #use cosine similarity for all documents
         return cosine_similarity(tfidf_matrix)
 
     elif method == "kmeans" and cluster_labels is not None:
-        # Compute similarity within clusters
+        #compute similarity within clusters
         scores = []
         for cluster in np.unique(cluster_labels):
-            # Get documents in the same cluster
+            #get documents in the same cluster
             cluster_indices = np.where(cluster_labels == cluster)[0]
             cluster_matrix = tfidf_matrix[cluster_indices]
             cluster_scores = cosine_similarity(cluster_matrix)
@@ -59,15 +59,15 @@ def plot_comparative_precision_recall(y_true, scores_srp, scores_kmeans):
         - scores_srp: Predicted similarity scores for SRP-LSH.
         - scores_kmeans: Predicted similarity scores for K-means LSH.
     """
-    # Precision-Recall for SRP-LSH
+    #precision-Recall for SRP-LSH
     precision_srp, recall_srp, _ = precision_recall_curve(y_true, scores_srp)
     pr_auc_srp = auc(recall_srp, precision_srp)
 
-    # Precision-Recall for K-means LSH
+    #precision-Recall for K-means LSH
     precision_kmeans, recall_kmeans, _ = precision_recall_curve(y_true, scores_kmeans)
     pr_auc_kmeans = auc(recall_kmeans, precision_kmeans)
 
-    # Plot the curves
+    #plot the curves
     plt.figure(figsize=(10, 6))
     plt.plot(recall_srp, precision_srp, label=f"SRP-LSH (AUC = {pr_auc_srp:.2f})", color="blue", linewidth=2)
     plt.plot(recall_kmeans, precision_kmeans, label=f"K-means LSH (AUC = {pr_auc_kmeans:.2f})", color="orange", linewidth=2)

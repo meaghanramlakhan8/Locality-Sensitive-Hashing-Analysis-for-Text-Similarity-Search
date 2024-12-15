@@ -33,13 +33,14 @@ def plot_by_frequency(tfidf_matrix, vectorizer, top_n=25):
     """
     #extract words and their frequencies
     terms = vectorizer.get_feature_names_out() 
-    term_frequencies = tfidf_matrix.sum(axis=0)  #get the sum of TF-IDF scores for each term across all documents
+    #get the sum of TF-IDF scores for each term across all documents
+    term_frequencies = tfidf_matrix.sum(axis=0) 
     term_frequencies = term_frequencies.A1  #convert to a flat array
 
     #combine words with their frequencies
     term_frequency_pairs = list(zip(terms, term_frequencies))
 
-    #aort words by frequency in descending order
+    #sort words by frequency in descending order
     ranking = sorted(term_frequency_pairs, key=lambda x: x[1], reverse=True)
 
     #display the top words and their frequencies
@@ -47,7 +48,7 @@ def plot_by_frequency(tfidf_matrix, vectorizer, top_n=25):
     for word, frequency in ranking[:top_n]: 
         print(f"Word: {word}, Frequency: {frequency}")
     
-    #plotting
+    #plotting the function
     top_terms, top_frequencies = zip(*ranking[:top_n])
     plt.figure(figsize=(10, 6))
     plt.barh(top_terms, top_frequencies, color='skyblue')
@@ -82,10 +83,12 @@ def plot_clusters(tfidf_matrix, kmeans_labels, categories_of_documents):
     plt.figure(figsize=(12, 8))
     for category, doc_indices in categories_of_documents.items():
         plt.scatter(
-            reduced_data[doc_indices, 0],  # PCA Component 1
-            reduced_data[doc_indices, 1],  # PCA Component 2
-            c=[kmeans_labels[i] for i in doc_indices],  #colors for the clusters
-            cmap='viridis',  # Colormap for clusters
+            # PCA Component 1
+            reduced_data[doc_indices, 0], 
+            # PCA Component 2 
+            reduced_data[doc_indices, 1],  
+            c=[kmeans_labels[i] for i in doc_indices],  
+            cmap='viridis',  
             alpha=0.7,
             marker=marker_map[category],
             label=f"{category}",

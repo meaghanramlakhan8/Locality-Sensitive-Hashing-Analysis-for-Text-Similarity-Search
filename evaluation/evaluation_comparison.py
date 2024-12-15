@@ -18,7 +18,7 @@ def compute_lsh_precisions(tfidf_matrix, categories_of_documents):
     cluster_range = [3,6,9,12,15,18,21,24,27,30]
     plane_range = [3,6,9,12,15,18,21,24,27,30]
 
-    # Reverse mapping: document index -> category
+    #reverse mapping: document index -> category
     doc_to_category = {}
     for category, doc_indices in categories_of_documents.items():
         for doc_idx in doc_indices:
@@ -26,7 +26,7 @@ def compute_lsh_precisions(tfidf_matrix, categories_of_documents):
 
     results = {"kmeans": {}, "srp": {}}
 
-    # Evaluate K-means LSH
+    #evaluate K-means LSH
     for n_clusters in cluster_range:
         kmeans_labels = kmeans_lsh(tfidf_matrix, n_clusters=n_clusters)
 
@@ -37,14 +37,14 @@ def compute_lsh_precisions(tfidf_matrix, categories_of_documents):
 
         precision_kmeans = 0
         for cluster, cluster_categories in kmeans_clusters.items():
-            # Find the most frequent category in the cluster
+            #find the most frequent category in the cluster
             majority_label_count = max([cluster_categories.count(category) for category in set(cluster_categories)])
             precision_kmeans += majority_label_count / len(cluster_categories)
 
         precision_kmeans /= len(kmeans_clusters)
         results["kmeans"][n_clusters] = precision_kmeans
 
-    # Evaluate SRP-LSH
+    #evaluate SRP-LSH
     for n_planes in plane_range:
         srp_hashes = signed_random_projections_lsh(tfidf_matrix, n_planes=n_planes)
         srp_buckets = np.dot(srp_hashes, 1 << np.arange(srp_hashes.shape[1]))
@@ -56,7 +56,7 @@ def compute_lsh_precisions(tfidf_matrix, categories_of_documents):
 
         precision_srp = 0
         for bucket, bucket_categories in srp_buckets_to_categories.items():
-            # Find the most frequent category in the bucket
+            #find the most frequent category in the bucket
             majority_label_count = max([bucket_categories.count(category) for category in set(bucket_categories)])
             precision_srp += majority_label_count / len(bucket_categories)
 
@@ -68,7 +68,7 @@ def compute_lsh_precisions(tfidf_matrix, categories_of_documents):
         for param, precision in precision_values.items():
             print(f"  {param}: Precision = {precision:.4f}")
 
-    # Extract data for plotting
+    #extract data for plotting
     kmeans_precisions = [results["kmeans"][n] for n in cluster_range]
     srp_precisions = [results["srp"][n] for n in plane_range]
 
@@ -83,6 +83,7 @@ def compute_lsh_precisions(tfidf_matrix, categories_of_documents):
     plt.grid(True, linestyle="--", alpha=0.7)
     plt.tight_layout()
 
-    comparison_plots_dir = os.path.join(os.getcwd(), "plots/comparison_plots") #setting output directory to be comparison_plots
+    #Setting output directory to be comparison_plots
+    comparison_plots_dir = os.path.join(os.getcwd(), "plots/comparison_plots") 
     plt.savefig(os.path.join(comparison_plots_dir, "compute_lsh_precisions.png"))
     plt.show()

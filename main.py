@@ -6,7 +6,6 @@ from evaluation.precision_recall import generate_ground_truth, compute_similarit
 from evaluation.evaluation_comparison import compute_lsh_precisions
 from evaluation.query_runtime_comparison import simulate_query_runtime, srp_query_func, kmeans_query_func, plot_query_time_real
 from evaluation.memory_usage import measure_memory_usage, plot_memory_usage
-from evaluation.scatterplot import plot_3d_comparative_metrics
 from sklearn.metrics import precision_recall_curve, auc
 import numpy as np
 
@@ -71,15 +70,12 @@ def main():
     # Plot query times
     plot_query_time_real(results)
 
-    # Measure memory usage for K-means LSH
+    #Plotting for memory usage
     memory_usage_kmeans = measure_memory_usage(kmeans_lsh, tfidf_matrix, n_clusters=7)
-
     # Measure memory usage for SRP-LSH
     memory_usage_srp = measure_memory_usage(signed_random_projections_lsh, tfidf_matrix, n_planes=10)
-
     # Plot memory usage comparison
     plot_memory_usage(memory_usage_kmeans, memory_usage_srp)
-
 
 if __name__ == "__main__":
     main()
