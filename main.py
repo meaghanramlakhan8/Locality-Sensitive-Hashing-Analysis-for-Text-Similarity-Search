@@ -14,10 +14,10 @@ def main():
     ### Beginning of section for K-means LSH
     kmeans_labels = kmeans_lsh(tfidf_matrix)
     print("Applied K-means LSH.")
-    plot_clusters(tfidf_matrix, kmeans_labels, categories_of_documents)  # Cluster plot for K-means
-    plot_radial_clusters(kmeans_labels, categories_of_documents)  # Radial clusters plot for K-means
-    write_clusters_to_file(kmeans_labels, categories_of_documents)  # Outputs counts of categories per cluster into file
-    visualize_cluster_counts(kmeans_labels, categories_of_documents)  # Visualization of counts of categories per cluster
+    #plot_clusters(tfidf_matrix, kmeans_labels, categories_of_documents)  # Cluster plot for K-means
+    #plot_radial_clusters(kmeans_labels, categories_of_documents)  # Radial clusters plot for K-means
+    #write_clusters_to_file(kmeans_labels, categories_of_documents)  # Outputs counts of categories per cluster into file
+    #visualize_cluster_counts(kmeans_labels, categories_of_documents)  # Visualization of counts of categories per cluster
 
     # Additional print statements for K-means visualization of data
     print("\n--- Additional Information ---")
@@ -30,22 +30,14 @@ def main():
     ### Beginning of section for SRP-LSH
     print("Applying Signed Random Projections LSH...")
     srp_hashes = signed_random_projections(tfidf_matrix, n_planes=7)
-    print(f"SRP Hash Codes (first 5 documents):\n{srp_hashes[:5]}")
-
-    # Visualize SRP results
-    visualize_srp_with_categories(tfidf_matrix, srp_hashes, labels, target_names, include_centroids=True)
-
-    # Plot similarity to SRP centroids with KDE
-    plot_similarity_to_srp_centroids(tfidf_matrix, srp_hashes)
+    #visualize_srp_with_categories(tfidf_matrix, srp_hashes, labels, target_names, include_centroids=True) # Visualize SRP results
+    #plot_similarity_to_srp_centroids(tfidf_matrix, srp_hashes) # Plot similarity to SRP centroids with KDE
 
     # Analyze SRP performance with varying hyperplanes
-    print("Analyzing SRP performance with varying hyperplanes...")
     n_planes_range = range(2, 21, 2)  # Test with hyperplanes from 2 to 20, stepping by 2
     plot_similarity_vs_planes(tfidf_matrix, n_planes_range)  # Plot similarity vs. number of hyperplanes
 
-    # Plot retrieval precision vs. number of SRP hyperplanes
-    print("Plotting retrieval precision vs. SRP hyperplanes...")
-    plot_retrieval_vs_buckets(tfidf_matrix, labels, n_planes_range)
+    plot_retrieval_vs_buckets(tfidf_matrix, labels, n_planes_range) # Plot retrieval precision vs. number of SRP hyperplanes
     ### End of section for SRP-LSH
 
     # Section for overall data visualizations

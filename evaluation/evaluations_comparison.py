@@ -77,4 +77,7 @@ def plot_comparative_precision_recall(y_true, scores_srp, scores_kmeans):
     plt.ylabel("Precision", fontsize=14)
     plt.legend(fontsize=12)
     plt.grid(True, linestyle="--", alpha=0.6)
+
+    comparison_plots_dir = os.path.join(os.getcwd(), "plots/comparison_plots") #setting output directory to be comparison_plots
+    plt.savefig(os.path.join(comparison_plots_dir, "plot_comparative_precision_recall.png"))
     plt.show()
