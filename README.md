@@ -35,8 +35,8 @@ We utilized the **20 Newsgroups Dataset**, a collection of 18,000 posts across 2
 - Removed headers, footers, and non-content elements.
 - Normalized text to lowercase and removed stopwords using NLTK.
 - Converted text to numerical vectors using **TF-IDF Vectorization** with the following parameters:
-  - `max_features=15000`: Retain the top 15,000 terms.
-  - `min_df=10`: Ignore terms appearing in fewer than 10 documents.
+  - `max_features=`: Retain the top 15,000 terms.
+  - `min_df=`: Ignore terms appearing in fewer than 10 documents.
   - Default `use_idf=True`: Apply inverse document frequency reweighting.
 
 ### **Techniques**
@@ -124,7 +124,3 @@ By tuning hyperparameters and employing dimensionality reduction, both methods c
 ## **References**
 - Paulevé, Loïc, et al. "Locality Sensitive Hashing: A Comparison of Hash Function Types and Querying Mechanisms." *Pattern Recognition Letters*, 2010.  
 - Jafari, Omid, et al. "A Survey on Locality Sensitive Hashing Algorithms and Their Applications." *arXiv*, 2021.
-
----
-
-Would you like additional customizations or refinements?
