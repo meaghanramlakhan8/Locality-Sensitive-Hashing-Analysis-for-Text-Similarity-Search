@@ -55,6 +55,9 @@ def plot_by_frequency(tfidf_matrix, vectorizer, top_n=25):
     plt.title(f"Top {top_n} Terms by Frequency")
     plt.xlabel("Frequency")
     plt.ylabel("Terms")
+
+    comparison_plots_dir = os.path.join(os.getcwd(), "plots/comparison_plots") #setting output directory to be comparison_plots
+    plt.savefig(os.path.join(comparison_plots_dir, "plot_by_frequency.png"))
     plt.show()
 
 def plot_clusters(tfidf_matrix, kmeans_labels, categories_of_documents):
@@ -95,7 +98,7 @@ def plot_clusters(tfidf_matrix, kmeans_labels, categories_of_documents):
     plt.xlabel("Textual Variance Dimension 1")
     plt.ylabel("Textual Variance Dimension 2")
 
-    kmeans_plots_dir = os.path.join(os.getcwd(), "kmeans_plots") #setting output directory to be kmeans_plots
+    kmeans_plots_dir = os.path.join(os.getcwd(), "plots/kmeans_plots") #setting output directory to be kmeans_plots
     plt.savefig(os.path.join(kmeans_plots_dir, "kmeans_clusters.png"))
     plt.show()
 
@@ -140,7 +143,7 @@ def plot_radial_clusters(kmeans_labels, categories_of_documents):
     plt.gca().set_aspect('equal', 'box')
     plt.title("Kmeans Radial Cluster Visualization (Shapes: Categories)")
     plt.legend(loc='best', title="Categories", fontsize='small')
-    kmeans_plots_dir = os.path.join(os.getcwd(), "kmeans_plots") #setting output directory to be kmeans_plots
+    kmeans_plots_dir = os.path.join(os.getcwd(), "plots/kmeans_plots") #setting output directory to be kmeans_plots
     plt.savefig(os.path.join(kmeans_plots_dir, "kmeans_radial_clusters.png"))
     plt.show()
 
@@ -269,6 +272,6 @@ def visualize_cluster_counts(kmeans_labels, categories_of_documents):
     plt.legend(title="Overall Categories", bbox_to_anchor=(1.05, 1), loc="upper left")
     plt.tight_layout()
 
-    kmeans_plots_dir = os.path.join(os.getcwd(), "kmeans_plots") #setting output directory to be kmeans_plots
+    kmeans_plots_dir = os.path.join(os.getcwd(), "plots/kmeans_plots") #setting output directory to be kmeans_plots
     plt.savefig(os.path.join(kmeans_plots_dir, "kmeans_visualize_cluster_counts.png"))
     plt.show()

@@ -14,10 +14,10 @@ def main():
     ### Beginning of section for K-means LSH
     kmeans_labels = kmeans_lsh(tfidf_matrix)
     print("Applied K-means LSH.")
-    plot_clusters(tfidf_matrix, kmeans_labels, categories_of_documents)  # Cluster plot for K-means
-    plot_radial_clusters(kmeans_labels, categories_of_documents)  # Radial clusters plot for K-means
-    write_clusters_to_file(kmeans_labels, categories_of_documents)  # Outputs counts of categories per cluster into file
-    visualize_cluster_counts(kmeans_labels, categories_of_documents)  # Visualization of counts of categories per cluster
+    #plot_clusters(tfidf_matrix, kmeans_labels, categories_of_documents)  # Cluster plot for K-means
+    #plot_radial_clusters(kmeans_labels, categories_of_documents)  # Radial clusters plot for K-means
+    #write_clusters_to_file(kmeans_labels, categories_of_documents)  # Outputs counts of categories per cluster into file
+    #visualize_cluster_counts(kmeans_labels, categories_of_documents)  # Visualization of counts of categories per cluster
 
     # Additional print statements for K-means visualization of data
     print("\n--- Additional Information ---")

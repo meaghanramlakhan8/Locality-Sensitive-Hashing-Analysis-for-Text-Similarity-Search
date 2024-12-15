@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import normalize
 from sklearn.metrics.pairwise import cosine_similarity
+import os
 
 def signed_random_projections(tfidf_matrix, n_planes=7):
     """
@@ -99,6 +100,9 @@ def plot_similarity_to_srp_centroids(tfidf_matrix, hash_codes):
     plt.ylabel("Number of Documents", fontsize=14)
     plt.legend(fontsize=12)
     plt.grid(True, linestyle="--", alpha=0.6)
+
+    SRP_plots_dir = os.path.join(os.getcwd(), "plots/SRP_plots") #setting output directory to be SRP_plots
+    plt.savefig(os.path.join(SRP_plots_dir, "plot_similarity_to_srp_centroids.png"))
     plt.show()
 
 def plot_retrieval_vs_buckets(tfidf_matrix, labels, n_planes_range):
@@ -130,6 +134,9 @@ def plot_retrieval_vs_buckets(tfidf_matrix, labels, n_planes_range):
     plt.ylabel("Precision (Macro Average)", fontsize=14)
     plt.grid(True, linestyle="--", alpha=0.6)
     plt.legend(fontsize=12)
+
+    SRP_plots_dir = os.path.join(os.getcwd(), "plots/SRP_plots") #setting output directory to be SRP_plots
+    plt.savefig(os.path.join(SRP_plots_dir, "plot_retrieval_vs_buckets.png"))
     plt.show()
 
 def visualize_srp_with_categories(tfidf_matrix, hash_codes, labels, target_names, include_centroids=True):
@@ -180,6 +187,9 @@ def visualize_srp_with_categories(tfidf_matrix, hash_codes, labels, target_names
     plt.xlabel("PCA Component 1")
     plt.ylabel("PCA Component 2")
     plt.grid(True)
+
+    SRP_plots_dir = os.path.join(os.getcwd(), "plots/SRP_plots") #setting output directory to be SRP_plots
+    plt.savefig(os.path.join(SRP_plots_dir, "visualize_srp_with_categories.png"))
     plt.show()
 
     # Optionally, plot similarity to SRP centroids
@@ -227,4 +237,7 @@ def plot_similarity_vs_planes(tfidf_matrix, n_planes_range):
     plt.ylabel("Mean Cosine Similarity", fontsize=14)
     plt.grid(True, linestyle="--", alpha=0.6)
     plt.legend(fontsize=12)
+
+    SRP_plots_dir = os.path.join(os.getcwd(), "plots/SRP_plots") #setting output directory to be SRP_plots
+    plt.savefig(os.path.join(SRP_plots_dir, "plot_similarity_vs_planes.png"))
     plt.show()
