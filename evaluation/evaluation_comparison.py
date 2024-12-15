@@ -4,6 +4,7 @@ from sklearn.metrics import precision_recall_curve, auc
 from sklearn.metrics.pairwise import cosine_similarity
 import matplotlib.pyplot as plt
 from collections import defaultdict
+import os
 
 def generate_ground_truth(labels):
     """
@@ -55,7 +56,8 @@ def compute_similarity_scores(tfidf_matrix, method="srp", cluster_labels=None):
 
 def compute_lsh_precisions(tfidf_matrix, categories_of_documents):
     """
-    Evaluate K-means LSH and SRP LSH precisions for different numbers of clusters and planes.
+    Evaluate K-means LSH and SRP LSH precisions for different numbers of clusters and planes,
+    and plot the results.
 
     Params:
         - tfidf_matrix: Sparse TF-IDF matrix.
@@ -66,8 +68,8 @@ def compute_lsh_precisions(tfidf_matrix, categories_of_documents):
     Returns:
         - results: Dictionary containing precision scores for both K-means and SRP.
     """
-    cluster_range = [5, 10, 15, 20, 25, 30]
-    plane_range = [5, 10, 15, 20, 25, 30]
+    cluster_range = [3,6,9,12,15,18,21,24,27,30]
+    plane_range = [3,6,9,12,15,18,21,24,27,30]
 
     # Reverse mapping: document index -> category
     doc_to_category = {}
@@ -114,4 +116,27 @@ def compute_lsh_precisions(tfidf_matrix, categories_of_documents):
         precision_srp /= len(srp_buckets_to_categories)
         results["srp"][n_planes] = precision_srp
 
-    return results
+    for method, precision_values in results.items():
+        print(f"Method: {method}")
+        for param, precision in precision_values.items():
+            print(f"  {param}: Precision = {precision:.4f}")
+
+    # Extract data for plotting
+    kmeans_precisions = [results["kmeans"][n] for n in cluster_range]
+    srp_precisions = [results["srp"][n] for n in plane_range]
+
+
+    plt.figure(figsize=(10, 6))
+    plt.plot(cluster_range, kmeans_precisions, marker="o", label="K-means LSH")
+    plt.plot(plane_range, srp_precisions, marker="s", label="SRP LSH")
+    plt.xlabel("Number of Clusters / Planes", fontsize=12)
+    plt.ylabel("Precision", fontsize=12)
+    plt.title("Precision of K-means LSH vs. SRP LSH", fontsize=14)
+    plt.legend(fontsize=10)
+    plt.grid(True, linestyle="--", alpha=0.7)
+    plt.tight_layout()
+
+    comparison_plots_dir = os.path.join(os.getcwd(), "plots/comparison_plots") #setting output directory to be comparison_plots
+    plt.savefig(os.path.join(comparison_plots_dir, "compute_lsh_precisions.png"))
+    plt.show()
+    

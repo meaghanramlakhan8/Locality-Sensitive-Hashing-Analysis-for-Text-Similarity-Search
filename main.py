@@ -41,11 +41,8 @@ def main():
     plot_by_frequency(tfidf_matrix, vectorizer)  # Outputs the top 25 words across all data
 
     print("about to print results")
-    results = compute_lsh_precisions(tfidf_matrix, categories_of_documents) #gets the precision of both LSH's based on different clusters/planes
-    for method, precision_values in results.items():
-        print(f"Method: {method}")
-        for param, precision in precision_values.items():
-            print(f"  {param}: Precision = {precision:.4f}")
+    compute_lsh_precisions(tfidf_matrix, categories_of_documents) #gets the precision of both LSH's based on different clusters/planes
+    
 
 
 if __name__ == "__main__":
