@@ -24,7 +24,7 @@ This analysis provides actionable insights into the trade-offs between **scalabi
 ### **Dataset**
 - **20 Newsgroups Dataset**:
   - ~18,000 documents.
-  - Distributed across **20 categories**: Sports, Science, Computers, and Religion.
+  - Distributed across **20 categories**: The overall categories that we used in this project were Sports, Science, Computers, and Religion.
 
 ### **Preprocessing Steps**
 - **Text Cleaning**:
@@ -60,9 +60,6 @@ This analysis provides actionable insights into the trade-offs between **scalabi
    - Measured using Python’s `tracemalloc` library.
 
 ### **Experimental Setup**
-- **Baseline Comparisons**:
-  - Exact nearest neighbor search (upper bound).
-  - Random retrieval (lower bound).
 - **Scalability Analysis**:
   - Evaluated performance on dataset sizes ranging from **2,500 to 18,000 documents**.
 - **Hyperparameter Tuning**:
