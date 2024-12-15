@@ -181,6 +181,10 @@ def visualize_srp_with_categories(tfidf_matrix, hash_codes, labels, target_names
     plt.xlim(-0.2, 0.4)
     plt.ylabel("PCA Component 2")
     plt.grid(True)
+
+    #Setting output directory to be SRP_plots
+    SRP_plots_dir = os.path.join(os.getcwd(), "plots/SRP_plots") #setting output directory to be SRP_plots
+    plt.savefig(os.path.join(SRP_plots_dir, "visualize_srp_with_categories.png"))
     plt.show()
     
 

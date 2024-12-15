@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from lsh_methods.lsh_methods import signed_random_projections_lsh
 from sklearn.metrics.pairwise import cosine_similarity
 from lsh_methods.lsh_methods import kmeans_lsh
+import os
 
 
 def simulate_query_runtime(tfidf_matrix, dataset_sizes, srp_query_func, kmeans_query_func, srp_params, kmeans_params):
@@ -103,5 +104,5 @@ def plot_query_time_real(results):
 
     #Setting output directory to be comparison_plots
     comparison_plots_dir = os.path.join(os.getcwd(), "plots/comparison_plots") 
-    plt.savefig(os.path.join(comparison_plots_dir, "compute_lsh_precisions.png"))
+    plt.savefig(os.path.join(comparison_plots_dir, "plot_query_time_real.png"))
     plt.show()

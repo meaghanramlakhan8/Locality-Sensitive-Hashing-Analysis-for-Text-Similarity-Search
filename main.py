@@ -2,7 +2,6 @@ from lsh_methods.lsh_methods import kmeans_lsh, signed_random_projections_lsh
 from preprocessing.preprocessing import get_data, preprocess
 from evaluation.evaluationsrp import visualize_srp_with_categories, plot_similarity_to_srp_centroids, plot_similarity_vs_planes, write_srp_clusters_to_file
 from evaluation.evaluation_kmeans import plot_clusters, plot_radial_clusters, plot_by_frequency, write_clusters_to_file, visualize_cluster_counts
-from evaluation.precision_recall import generate_ground_truth, compute_similarity_scores, precision_recall_curve
 from evaluation.evaluation_comparison import compute_lsh_precisions
 from evaluation.query_runtime_comparison import simulate_query_runtime, srp_query_func, kmeans_query_func, plot_query_time_real
 from evaluation.memory_usage import measure_memory_usage, plot_memory_usage
