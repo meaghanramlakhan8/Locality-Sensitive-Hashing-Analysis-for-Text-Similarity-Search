@@ -63,5 +63,7 @@ def plot_memory_usage(memory_usage_kmeans, memory_usage_srp):
     plt.grid(axis="x", linestyle="--", alpha=0.6)
     plt.tight_layout()
 
-    #display the plot
+    #Setting output directory to be comparison_plots
+    comparison_plots_dir = os.path.join(os.getcwd(), "plots/comparison_plots") 
+    plt.savefig(os.path.join(comparison_plots_dir, "compute_lsh_precisions.png"))
     plt.show()

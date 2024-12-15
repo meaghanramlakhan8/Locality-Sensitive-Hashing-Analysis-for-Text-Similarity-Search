@@ -100,4 +100,8 @@ def plot_query_time_real(results):
     plt.ylabel("Query Time (seconds)", fontsize=14)
     plt.legend(fontsize=12)
     plt.grid(True, linestyle="--", alpha=0.6)
+
+    #Setting output directory to be comparison_plots
+    comparison_plots_dir = os.path.join(os.getcwd(), "plots/comparison_plots") 
+    plt.savefig(os.path.join(comparison_plots_dir, "compute_lsh_precisions.png"))
     plt.show()
