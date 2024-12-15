@@ -4,6 +4,7 @@ from sklearn.metrics import precision_score, recall_score, f1_score, silhouette_
 import numpy as np
 from matplotlib import cm, colors
 from sklearn.manifold import TSNE
+import os
 
 def evaluate_retrieval(ground_truth, predictions):
     """
@@ -93,6 +94,9 @@ def plot_clusters(tfidf_matrix, kmeans_labels, categories_of_documents):
     plt.title("Visualization for K-Means LSH (Colors: Clusters, Shapes: Categories)")
     plt.xlabel("Textual Variance Dimension 1")
     plt.ylabel("Textual Variance Dimension 2")
+
+    kmeans_plots_dir = os.path.join(os.getcwd(), "kmeans_plots") #setting output directory to be kmeans_plots
+    plt.savefig(os.path.join(kmeans_plots_dir, "kmeans_clusters.png"))
     plt.show()
 
 def plot_radial_clusters(kmeans_labels, categories_of_documents):
@@ -136,6 +140,8 @@ def plot_radial_clusters(kmeans_labels, categories_of_documents):
     plt.gca().set_aspect('equal', 'box')
     plt.title("Kmeans Radial Cluster Visualization (Shapes: Categories)")
     plt.legend(loc='best', title="Categories", fontsize='small')
+    kmeans_plots_dir = os.path.join(os.getcwd(), "kmeans_plots") #setting output directory to be kmeans_plots
+    plt.savefig(os.path.join(kmeans_plots_dir, "kmeans_radial_clusters.png"))
     plt.show()
 
 def write_clusters_to_file(kmeans_labels, categories_of_documents, output_file="kmeans_results.txt"):
@@ -262,4 +268,7 @@ def visualize_cluster_counts(kmeans_labels, categories_of_documents):
     plt.xticks(x, [f"Cluster {c}" for c in clusters_sorted], rotation=45)
     plt.legend(title="Overall Categories", bbox_to_anchor=(1.05, 1), loc="upper left")
     plt.tight_layout()
+
+    kmeans_plots_dir = os.path.join(os.getcwd(), "kmeans_plots") #setting output directory to be kmeans_plots
+    plt.savefig(os.path.join(kmeans_plots_dir, "kmeans_visualize_cluster_counts.png"))
     plt.show()
