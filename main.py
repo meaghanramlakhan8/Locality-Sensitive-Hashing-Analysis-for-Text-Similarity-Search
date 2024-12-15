@@ -45,8 +45,23 @@ def main():
     scores_srp = cosine_similarity(tfidf_matrix).flatten()  # Placeholder for SRP similarities
     scores_kmeans = cosine_similarity(tfidf_matrix).flatten()  # Placeholder for K-means similarities
 
-    plot_comparative_precision_recall(y_true, scores_srp, scores_kmeans)
+    
+    
     ### End of section for overall data visualizations ###
+    plot_comparative_precision_recall(y_true, scores_srp, scores_kmeans)
+    # Dataset sizes to test
+    dataset_sizes = [500, 1000, 2000, 3000, 4000, 5000]
+
+    # Measure query runtimes
+    query_times_srp, query_times_kmeans = simulate_query_runtime(
+        tfidf_matrix, dataset_sizes,
+        srp_query_func, kmeans_query_func,
+        srp_params={'n_planes': 7}, kmeans_params={'n_clusters': 10}
+    )
+
+    # Plot query efficiency
+    plot_query_efficiency(dataset_sizes, query_times_srp, query_times_kmeans)
+
 
 
 if __name__ == "__main__":
