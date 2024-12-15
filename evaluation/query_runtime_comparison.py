@@ -1,9 +1,9 @@
 import time
 import numpy as np
 import matplotlib.pyplot as plt
+from lsh_methods.lsh_methods import signed_random_projections_lsh
 from sklearn.metrics.pairwise import cosine_similarity
 from lsh_methods.lsh_methods import kmeans_lsh
-from evaluation.evaluationsrp import signed_random_projections
 
 
 def simulate_query_runtime(tfidf_matrix, dataset_sizes, srp_query_func, kmeans_query_func, srp_params, kmeans_params):
@@ -47,8 +47,8 @@ def srp_query_func(matrix, query_vector, n_planes=10):
     Perform a full SRP-LSH query.
     """
     # Generate SRP hash codes
-    hash_codes = signed_random_projections(matrix, n_planes)
-    query_hash = signed_random_projections(query_vector.reshape(1, -1), n_planes)
+    hash_codes = signed_random_projections_lsh(matrix, n_planes)
+    query_hash = signed_random_projections_lsh(query_vector.reshape(1, -1), n_planes)
 
     # Find documents in the same bucket
     bucket_indices = np.where((hash_codes == query_hash).all(axis=1))[0]
