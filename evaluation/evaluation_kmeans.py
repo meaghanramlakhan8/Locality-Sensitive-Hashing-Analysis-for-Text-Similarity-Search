@@ -248,7 +248,7 @@ def visualize_cluster_counts(kmeans_labels, categories_of_documents):
         cluster_overall_counts[cluster] = overall_counts
 
     clusters_sorted = sorted(cluster_overall_counts.keys())
-    all_overall_categories = ["Sports", "Science", "Computers", "Religion", "Unknown"]
+    all_overall_categories = ["Sports", "Science", "Computers", "Religion"]
 
     #create matrix for counts: rows are clusters, columns are overall categories
     counts_matrix = []
