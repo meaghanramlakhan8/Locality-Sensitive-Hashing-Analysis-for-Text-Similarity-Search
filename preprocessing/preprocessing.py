@@ -19,8 +19,8 @@ def get_data(sample_size=None):
         - data.target_names : array containing the names of all the categories
     """
     sports_categories = ['rec.autos', 'rec.motorcycles', 'rec.sport.baseball', 'rec.sport.hockey']  
-    science_categories = ['sci.electronics', 'sci.med', 'sci.space', 'sci.crypt']
-    comp_categories = ['comp.sys.mac.hardware', 'comp.graphics', 'comp.windows.x' , 'comp.sys.ibm.pc.hardware', 'comp.os.ms-windows.misc']
+    science_categories = ['sci.electronics', 'sci.med', 'sci.space']
+    comp_categories = ['comp.sys.mac.hardware', 'comp.graphics', 'comp.windows.x' , 'comp.sys.ibm.pc.hardware']
     religion_categories = ['talk.religion.misc', 'soc.religion.christian']
     categories = sports_categories + science_categories + comp_categories + religion_categories
     data = fetch_20newsgroups(subset='all', categories=categories, remove=('headers', 'footers', 'quotes'))
