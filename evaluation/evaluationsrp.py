@@ -186,3 +186,45 @@ def visualize_srp_with_categories(tfidf_matrix, hash_codes, labels, target_names
     if include_centroids:
         print("Plotting similarity to SRP centroids...")
         plot_similarity_to_srp_centroids(tfidf_matrix, hash_codes)
+
+def plot_similarity_vs_planes(tfidf_matrix, n_planes_range):
+    """
+    Plot the mean cosine similarity vs. number of hyperplanes for SRP.
+
+    Params:
+        - tfidf_matrix: Sparse TF-IDF matrix.
+        - n_planes_range: List or range of hyperplane counts to test.
+    """
+    mean_similarities = []
+
+    for n_planes in n_planes_range:
+        print(f"Testing SRP with {n_planes} hyperplanes...")
+        # Perform SRP with current number of hyperplanes
+        hash_codes = signed_random_projections(tfidf_matrix, n_planes)
+        
+        # Compute SRP centroids and similarities
+        centroids, bucket_assignments = compute_srp_centroids(tfidf_matrix, hash_codes)
+        similarities = []
+        for bucket, indices in bucket_assignments.items():
+            bucket_matrix = tfidf_matrix[indices]
+            centroid = centroids[bucket]
+
+            # Convert data to dense format
+            bucket_matrix_dense = bucket_matrix.toarray()
+            centroid_dense = np.asarray(centroid).reshape(1, -1)
+
+            # Compute cosine similarities
+            similarities.extend(cosine_similarity(bucket_matrix_dense, centroid_dense).flatten())
+        
+        # Store the mean similarity for this n_planes
+        mean_similarities.append(np.mean(similarities))
+    
+    # Plot the results
+    plt.figure(figsize=(12, 8))
+    plt.plot(n_planes_range, mean_similarities, marker='o', color='blue', label="Mean Similarity")
+    plt.title("Mean Cosine Similarity vs. Number of SRP Hyperplanes", fontsize=16)
+    plt.xlabel("Number of Hyperplanes (n_planes)", fontsize=14)
+    plt.ylabel("Mean Cosine Similarity", fontsize=14)
+    plt.grid(True, linestyle="--", alpha=0.6)
+    plt.legend(fontsize=12)
+    plt.show()
