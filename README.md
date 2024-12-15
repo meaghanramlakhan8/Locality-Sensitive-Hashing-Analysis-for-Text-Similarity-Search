@@ -15,7 +15,7 @@ Our findings aim to guide the selection of appropriate LSH methods for applicati
   - **K-means LSH**: Uses cluster assignments from K-means clustering as hash codes.
 - Analyze trade-offs between:
   - **Retrieval accuracy (Precision@k)**
-  - **Indexing and query efficiency**
+  - **Query efficiency**
   - **Scalability for large datasets**
 - Explore the impact of hyperparameters such as:
   - Number of hash functions (`n`) for SRP-LSH.
@@ -65,7 +65,7 @@ We utilized the **20 Newsgroups Dataset**, a collection of 18,000 posts across 2
 
 ### **Experimental Procedure**
 1. **Hyperparameter Tuning**:
-   - Varied `n` (number of hash functions) for SRP-LSH.
+   - Varied `n` (number of hyperplanes) for SRP-LSH.
    - Varied `k` (number of clusters) for K-means LSH.
    - Identified optimal parameters for retrieval performance.
 2. **Baseline Comparison**:
@@ -90,8 +90,8 @@ We utilized the **20 Newsgroups Dataset**, a collection of 18,000 posts across 2
 
 3. **Hyperparameter Insights**:
    - Optimal performance observed at:
-     - **12 hyperplanes** for SRP-LSH.
-     - **20 clusters** for K-means LSH.
+     - **10 hyperplanes** for SRP-LSH.
+     - **7 clusters** for K-means LSH.
    - Multi-probing strategies improved recall for SRP-LSH.
 
 ### **Visualizations**
