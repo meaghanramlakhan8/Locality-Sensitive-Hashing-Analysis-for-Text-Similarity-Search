@@ -4,22 +4,7 @@ from scipy.stats import gaussian_kde
 from sklearn.metrics.pairwise import cosine_similarity
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
-
-def signed_random_projections(tfidf_matrix, n_planes=7):
-    """
-    Perform Signed Random Projections (SRP).
-
-    Params:
-        - tfidf_matrix: Sparse TF-IDF matrix.
-        - n_planes: Number of random hyperplanes.
-
-    Returns:
-        - hash_codes: Binary hash codes for each document.
-    """
-    random_planes = np.random.randn(n_planes, tfidf_matrix.shape[1])  # Generate random hyperplanes
-    projections = tfidf_matrix.dot(random_planes.T)  # Project data onto hyperplanes
-    hash_codes = (projections > 0).astype(int)  # Convert projections to binary hash codes
-    return hash_codes
+from lsh_methods.lsh_methods import signed_random_projections_lsh
 
 def compute_srp_centroids(tfidf_matrix, hash_codes):
     """
@@ -145,6 +130,61 @@ def plot_similarity_to_srp_centroids(tfidf_matrix, hash_codes):
     plt.savefig(os.path.join(SRP_plots_dir, "plot_similarity_to_srp_centroids.png"))
     plt.show()
 
+
+def visualize_srp_with_categories(tfidf_matrix, hash_codes, labels, target_names, include_centroids=True):
+    """
+    Visualize SRP-LSH results with PCA and optionally plot similarity to centroids.
+
+    Params:
+        - tfidf_matrix: Sparse TF-IDF matrix.
+        - hash_codes: Binary hash codes for each document.
+        - labels: Ground truth category labels for each document.
+        - target_names: List of category names corresponding to labels.
+        - include_centroids: Whether to plot similarity to SRP centroids.
+    """
+    # Reduce the TF-IDF matrix to 2D using PCA
+    pca = PCA(n_components=2)
+    reduced_data = pca.fit_transform(tfidf_matrix.toarray())
+
+    # Convert binary hash codes to integers
+    hash_labels = np.dot(hash_codes, 1 << np.arange(hash_codes.shape[1]))
+
+    # Define the same markers for categories as the K-means plot
+    marker_styles = ['o', 's', 'D', '^', 'v', '<', '>', 'h', 'p', '*', 'x']
+    unique_categories = np.unique(labels)
+    marker_map = {cat: marker_styles[i % len(marker_styles)] for i, cat in enumerate(unique_categories)}
+
+
+    # Create scatter plot
+    plt.figure(figsize=(12, 8))
+    scatter = None
+    for category in unique_categories:
+        indices = labels == category
+        scatter = plt.scatter(
+            reduced_data[indices, 0], reduced_data[indices, 1],
+            c=hash_labels[indices],  # Use hash labels for colors
+            cmap='viridis',          # Color map for buckets
+            label=target_names[category],
+            alpha=0.8,
+            s=100,
+            marker=marker_map[category]  # Use consistent marker shapes
+        )
+
+    # Add colorbar for hash buckets
+    cbar = plt.colorbar(scatter)
+    cbar.set_label("Hash Bucket")
+
+    # Add legend for ground truth categories
+    plt.legend(title="Categories", fontsize='small')
+    plt.title("Cluster Visualization with SRP-LSH (Colors: Buckets, Shapes: Categories)")
+    plt.xlabel("PCA Component 1")
+    plt.xlim(-0.2, 0.4)
+    plt.ylabel("PCA Component 2")
+    plt.grid(True)
+    plt.show()
+    
+
+
 def plot_similarity_vs_planes(tfidf_matrix, n_planes_range):
     """
     Plot the mean cosine similarity vs. number of hyperplanes for SRP.
@@ -156,8 +196,9 @@ def plot_similarity_vs_planes(tfidf_matrix, n_planes_range):
     mean_similarities = []
 
     for n_planes in n_planes_range:
+        print(f"Testing SRP with {n_planes} hyperplanes...")
         # Perform SRP with current number of hyperplanes
-        hash_codes = signed_random_projections(tfidf_matrix, n_planes)
+        hash_codes = signed_random_projections_lsh(tfidf_matrix, n_planes)
         
         # Compute SRP centroids and similarities
         centroids, bucket_assignments = compute_srp_centroids(tfidf_matrix, hash_codes)
@@ -165,8 +206,12 @@ def plot_similarity_vs_planes(tfidf_matrix, n_planes_range):
         for bucket, indices in bucket_assignments.items():
             bucket_matrix = tfidf_matrix[indices]
             centroid = centroids[bucket]
+
+            # Convert data to dense format
             bucket_matrix_dense = bucket_matrix.toarray()
             centroid_dense = np.asarray(centroid).reshape(1, -1)
+
+            # Compute cosine similarities
             similarities.extend(cosine_similarity(bucket_matrix_dense, centroid_dense).flatten())
         
         # Store the mean similarity for this n_planes
@@ -175,89 +220,12 @@ def plot_similarity_vs_planes(tfidf_matrix, n_planes_range):
     # Plot the results
     plt.figure(figsize=(12, 8))
     plt.plot(n_planes_range, mean_similarities, marker='o', color='blue', label="Mean Similarity")
-    plt.title("Mean Similarity vs. Number of SRP Hyperplanes", fontsize=16)
+    plt.title("Mean Cosine Similarity vs. Number of SRP Hyperplanes", fontsize=16)
     plt.xlabel("Number of Hyperplanes (n_planes)", fontsize=14)
     plt.ylabel("Mean Cosine Similarity", fontsize=14)
     plt.grid(True, linestyle="--", alpha=0.6)
     plt.legend(fontsize=12)
-    plt.show()
 
-def visualize_srp_with_categories(data, hash_codes, ground_truth_labels, category_names):
-    """
-    Visualize SRP-LSH results with PCA and ground truth categories.
-    
-    Params:
-        - data: High-dimensional input data.
-        - hash_codes: Binary hash codes for each data point.
-        - ground_truth_labels: Ground truth category labels for each data point.
-        - category_names: Names of the categories.
-    """
-    # Reduce data to 2D for visualization
-    pca = PCA(n_components=2)
-    reduced_data = pca.fit_transform(data)
-
-    # Convert binary hash codes to integers for visualization
-    hash_labels = np.dot(hash_codes, 1 << np.arange(hash_codes.shape[1]))
-
-    # Define unique shapes for categories
-    shapes = ['o', 's', 'D', '^', 'P', 'X']
-    unique_categories = np.unique(ground_truth_labels)
-    shape_mapping = {cat: shapes[i % len(shapes)] for i, cat in enumerate(unique_categories)}
-
-    # Create scatter plot
-    plt.figure(figsize=(12, 8))
-    scatter = None
-    for category in unique_categories:
-        indices = ground_truth_labels == category
-        scatter = plt.scatter(
-            reduced_data[indices, 0], reduced_data[indices, 1],
-            c=hash_labels[indices],  # Use hash labels for colors
-            cmap='viridis',          # Color map for buckets
-            label=category_names[category],
-            alpha=0.8,
-            s=100,
-            marker=shape_mapping[category]
-        )
-
-    # Add colorbar for hash buckets
-    cbar = plt.colorbar(scatter)
-    cbar.set_label("Hash Bucket")
-
-    # Add legend for ground truth categories
-    plt.legend(title="Categories")
-    plt.title("Cluster Visualization with SRP-LSH (Colors: Buckets, Shapes: Categories)")
-    plt.xlabel("PCA Component 1")
-    plt.ylabel("PCA Component 2")
-    plt.grid(True)
-    plt.show()
-
-def plot_retrieval_vs_buckets(tfidf_matrix, labels, n_planes_range):
-    """
-    Plot retrieval precision vs. number of SRP hash buckets.
-
-    Params:
-        - tfidf_matrix: Sparse TF-IDF matrix.
-        - labels: Ground truth labels for the documents.
-        - n_planes_range: List or range of hyperplane counts to test.
-    """
-    precisions = []
-    for n_planes in n_planes_range:
-        # Perform SRP
-        hash_codes = signed_random_projections(tfidf_matrix, n_planes)
-        bucket_ids = np.dot(hash_codes, 1 << np.arange(hash_codes.shape[1]))
-        
-        # Evaluate precision (or any metric) based on buckets
-        from sklearn.metrics import precision_score
-        predicted_labels = bucket_ids  # Treat bucket IDs as pseudo-labels
-        precision = precision_score(labels, predicted_labels, average="macro", zero_division=0)
-        precisions.append(precision)
-    
-    # Plot the results
-    plt.figure(figsize=(12, 8))
-    plt.plot(n_planes_range, precisions, marker='o', color='green', label="Precision")
-    plt.title("Retrieval Precision vs. Number of SRP Hyperplanes", fontsize=16)
-    plt.xlabel("Number of Hyperplanes (n_planes)", fontsize=14)
-    plt.ylabel("Precision (Macro Average)", fontsize=14)
-    plt.grid(True, linestyle="--", alpha=0.6)
-    plt.legend(fontsize=12)
+    SRP_plots_dir = os.path.join(os.getcwd(), "plots/SRP_plots") #setting output directory to be SRP_plots
+    plt.savefig(os.path.join(SRP_plots_dir, "plot_similarity_vs_planes.png"))
     plt.show()
